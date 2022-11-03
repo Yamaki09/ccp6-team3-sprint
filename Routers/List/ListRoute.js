@@ -4,6 +4,7 @@ const list_ctrl = require("../../Controllers/List/ListController");
 const {
   validatePostList,
   validatePostItem,
+  validatePostUser,
 } = require("../../Controllers/validationMiddleWare");
 
 router.get("/all", list_ctrl.getAllLists);
@@ -11,7 +12,7 @@ router.get("/:userid", list_ctrl.getUserLists);
 router.get("/:listid/items", list_ctrl.getItemsByListId);
 router.post("/", validatePostList, list_ctrl.postList);
 router.post("/item", validatePostItem, list_ctrl.postItem);
-router.post("/user", list_ctrl.postUser);
+router.post("/user", validatePostUser, list_ctrl.postUser);
 router.put("/:listid/item/:itemName", list_ctrl.putItem);
 router.delete("/:listid", list_ctrl.deleteList);
 router.delete("/:listid/item/:itemName", list_ctrl.deleteItemFromList);

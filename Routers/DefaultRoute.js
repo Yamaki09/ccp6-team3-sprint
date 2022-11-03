@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const cors = require("cors");
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config();
 const corsOption = {
   origin: process.env.FE_URL,
   optionsSuccessStatus: 200,
