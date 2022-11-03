@@ -66,8 +66,41 @@ const validatePostList = async (req, res, next) => {
     res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
   }
 };
+const validatePostItem = async (req, res, next) => {
+  try {
+    const { listid, itemName, quantity, purchaseStatus } = req.body;
+    const isRequestValid = [listid, itemName, quantity, purchaseStatus].some(
+      (value) => value !== undefined
+    );
+    const validQuantity = !isNaN(Number(quantity));
+    const errorMessage = [];
+
+    if (!isRequestValid) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!listid) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!itemName) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!quantity) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!validQuantity) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (typeof purchaseStatus !== "boolean")
+      errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+
+    if (errorMessage.length > 0) {
+      res.status(400).json({
+        message: ERROR_MSGS.VALIDATION_ERROR,
+        error: JSON.stringify(errorMessage),
+      });
+      return;
+    } else {
+      next();
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
+  }
+};
 
 module.exports = {
   validateSignUp,
   validatePostList,
+  validatePostItem,
 };
