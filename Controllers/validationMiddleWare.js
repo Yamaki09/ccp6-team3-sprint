@@ -66,8 +66,75 @@ const validatePostList = async (req, res, next) => {
     res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
   }
 };
+const validatePostItem = async (req, res, next) => {
+  try {
+    const { listid, itemName, quantity, purchaseStatus } = req.body;
+    const isRequestValid = [listid, itemName, quantity, purchaseStatus].some(
+      (value) => value !== undefined
+    );
+    const validQuantity = !isNaN(Number(quantity));
+    const errorMessage = [];
+
+    if (!isRequestValid) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!listid) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!itemName) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!quantity) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!validQuantity) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (typeof purchaseStatus !== "boolean")
+      errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+
+    if (errorMessage.length > 0) {
+      res.status(400).json({
+        message: ERROR_MSGS.VALIDATION_ERROR,
+        error: JSON.stringify(errorMessage),
+      });
+      return;
+    } else {
+      next();
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
+  }
+};
+const validatePostUser = async (req, res, next) => {
+  try {
+    const { listid, userid } = req.body;
+    const errorMessage = [];
+
+    if (!listid) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (!userid) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    const data = await knex
+      .select("*")
+      .from("users_in_list")
+      .where({ list_id: listid, user_id: userid });
+    const latestUserId = await knex("users").max("id");
+    const latestListId = await knex("lists").max("id");
+    if (listid > latestListId[0]["max"])
+      errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (userid > latestUserId[0]["max"])
+      errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (data.length > 0) errorMessage.push(ERROR_MSGS.INVALID_INPUT);
+    if (errorMessage.length > 0) {
+      res.status(400).json({
+        message: ERROR_MSGS.VALIDATION_ERROR,
+        error: JSON.stringify(errorMessage),
+      });
+      return;
+    } else {
+      next();
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
+  }
+};
 
 module.exports = {
   validateSignUp,
   validatePostList,
+  validatePostItem,
+  validatePostUser,
 };
