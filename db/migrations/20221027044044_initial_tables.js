@@ -35,6 +35,5 @@ exports.down = async (knex) => {
   await knex.schema.dropTable("items_in_list");
   await knex.schema.dropTable("users_in_list");
   await knex.schema.dropTable("lists");
-  await knex.schema.dropTable("items");
   await knex.schema.dropTable("users");
 };
