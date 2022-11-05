@@ -67,5 +67,24 @@ const UserController = {
       res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
     }
   },
+  signin: async (req, res) => {
+    try {
+      const { userEmail, userPassword } = req.body;
+      console.log(userEmail, userPassword);
+      const data = await knex("users")
+        .select({
+          userId: "id",
+          userName: "user_name",
+          userEmail: "user_email",
+          userProPic: "user_pro_pic",
+        })
+        .where({ user_email: userEmail, user_password: userPassword });
+      console.log(data);
+      res.status(200).json(data[0]);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: ERROR_MSGS.INTERNAL_SERVER_ERROR });
+    }
+  },
 };
 module.exports = UserController;
